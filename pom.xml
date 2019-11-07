@@ -12,7 +12,7 @@
 
     <!-- 项目说明：这里作为聚合工程的父工程 -->
     <groupId>com.example.boot</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>springboot-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <!-- 继承说明：这里继承Spring Boot提供的父工程 -->
