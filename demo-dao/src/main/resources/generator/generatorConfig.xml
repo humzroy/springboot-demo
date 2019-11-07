@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<!-- 可以指定多个generatorConfiguration标签，以从多个数据库，或以多种不同的参数，生成MyBatis文件 -->
+<generatorConfiguration>
+    <!-- 数据库驱动:选择你的本地硬盘上面的数据库驱动包-->
+    <classPathEntry location="D:\software\dataSource\mysql-connector-java.jar"/>
+
+    <!-- 主要配置内容，指定生成哪些MyBais文件，targetRunTime指定生成代码的运行目标，defaultModelType指定一张数据表生成一个领域模型类 -->
+    <!-- targetRuntime="MyBatis3Simple"：不生成Example.java文件，进而不生成XXXByExample方法，仅提供最基础的CRUD方法 -->
+    <!-- tragetRuntime="MyBatis3"：生成Example.java文件和XXXByExample方法，除了最基础的CRUD方法外，提供自定义动态Where子句功能 -->
+    <context id="MySQLTables" targetRuntime="MyBatis3" defaultModelType="flat">
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!--数据库链接URL，用户名、密码 -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/boot?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=UTC"
+                        userId="root" password="root">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <!-- false: 默认值，根据JDBC中的DECIMAL/NUMBERIC类型的具体定义，分别表达为java.math.BigDecimal, java.lang.Long/Integer/Short -->
+            <!-- true: 始终使用java.math.BigDecimal表达JDBC中的DECIMAL/NUMBERIC类型 -->
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <!-- 生成模型的包名和位置-->
+        <javaModelGenerator targetPackage="com.example.demo.dao.entity" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <!-- 生成映射文件的包名和位置-->
+        <sqlMapGenerator targetPackage="mybatis.business" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!-- 生成DAO的包名和位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.example.demo.dao.mapper.business"
+                             targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!-- 要生成的表 tableName是数据库中的表名或视图名 domainObjectName是实体类名-->
+        <table tableName="s_user" domainObjectName="User"
+               enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false">
+        </table>
+    </context>
+</generatorConfiguration>
