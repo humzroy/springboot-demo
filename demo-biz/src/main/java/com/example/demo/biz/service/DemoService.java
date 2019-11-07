@@ -21,4 +21,11 @@ public interface DemoService {
      * @date 2019/11/6 15:21
      **/
     void testTransaction();
+
+    /**
+     * @description 测试http
+     * @author wuhengzhen
+     * @date 2019/11/7 16:53
+     **/
+    void testHttp();
 }

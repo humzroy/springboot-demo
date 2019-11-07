@@ -39,4 +39,9 @@ public class DemoServiceTest {
         log.error("=====error=====");
     }
 
+    @Test
+    public void testTransaction() {
+        demoService.testTransaction();
+    }
+
 }

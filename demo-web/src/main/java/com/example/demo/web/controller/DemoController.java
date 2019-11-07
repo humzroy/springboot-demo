@@ -36,4 +36,10 @@ public class DemoController {
     public void testTransaction() {
         demoService.testTransaction();
     }
+
+    @GetMapping("http")
+    @ApiOperation("测试http")
+    public void testHttp() {
+        demoService.testHttp();
+    }
 }

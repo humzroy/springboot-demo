@@ -4,6 +4,8 @@ import com.example.demo.biz.exception.BizException;
 import com.example.demo.biz.service.DemoService;
 import com.example.demo.biz.service.UserService;
 import com.example.demo.common.error.DemoErrors;
+import com.example.demo.common.utils.HttpUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @Author wuhengzhen
  * @Date 2019-11-06 10:16
  */
+@Slf4j
 @Service
 public class DemoServiceImpl implements DemoService {
 
@@ -37,12 +40,26 @@ public class DemoServiceImpl implements DemoService {
      * @author wuhengzhen
      * @date 2019/11/6 15:21
      **/
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void testTransaction() {
         innerMethod();
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     * @description 测试http
+     * @author wuhengzhen
+     * @date 2019/11/7 16:22
+     **/
+    @Override
+    public void testHttp() {
+        long start = System.currentTimeMillis();
+        String json = HttpUtil.sendGet("http://www.baidu.com", "");
+        log.info("耗时:{}", System.currentTimeMillis() - start);
+        log.info(json);
+    }
+
+
     private void innerMethod() {
         userService.addUser("张三");
         userService.addUser("李四");

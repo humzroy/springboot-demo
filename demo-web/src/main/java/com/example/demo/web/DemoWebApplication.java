@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @Author wuhengzhen
  * @Date 2019-11-06 10:02
  */
-// @EnableAspectJAutoProxy
-// @EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
+@EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = "com.example.demo")
 @DubboComponentScan(basePackages = "com.example.demo.biz.service.impl.remote")
 @MapperScan("com.example.demo.dao.mapper")
