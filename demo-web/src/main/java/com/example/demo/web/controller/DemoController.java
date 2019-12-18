@@ -4,10 +4,7 @@ import com.example.demo.biz.service.DemoService;
 import com.example.demo.common.entity.Result;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created with IntelliJ IDEA
@@ -37,9 +34,11 @@ public class DemoController {
         demoService.testTransaction();
     }
 
-    @GetMapping("http")
+    @PostMapping("http")
     @ApiOperation("测试http")
-    public void testHttp() {
+    public Result<String> testHttp() {
         demoService.testHttp();
+        return Result.wrapSuccessfulResult("success");
+
     }
 }
