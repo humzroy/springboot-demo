@@ -3,4 +3,34 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.dao.mapper.business.UserMapper">
 
+    <resultMap id="BaseResultMap" type="me.aaron.util.mybatis.output.domain.SUser">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="login_name" jdbcType="VARCHAR" property="loginName"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="role" jdbcType="VARCHAR" property="role"/>
+        <result column="permission" jdbcType="VARCHAR" property="permission"/>
+        <result column="ban" jdbcType="VARCHAR" property="ban"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, login_name, password, user_name, role, permission, ban, mobile, email, create_time,
+        create_user
+    </sql>
+
+    <select id="getPassword" resultType="string">
+        select password
+        from s_user
+        where login_name = #{username,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByUserName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from s_user
+        where login_name = #{username,jdbcType=VARCHAR}
+    </select>
 </mapper>

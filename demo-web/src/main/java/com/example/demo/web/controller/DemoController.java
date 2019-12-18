@@ -39,7 +39,9 @@ public class DemoController {
 
     @GetMapping("http")
     @ApiOperation("测试http")
-    public void testHttp() {
+    public Result<String> testHttp() {
         demoService.testHttp();
+        return Result.wrapSuccessfulResult("success");
+
     }
 }

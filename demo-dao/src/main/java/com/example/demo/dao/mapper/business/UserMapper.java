@@ -1,6 +1,8 @@
 package com.example.demo.dao.mapper.business;
 
+import com.example.demo.dao.entity.system.SUser;
 import com.example.demo.dao.mapper.base.UserBaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -10,4 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserMapper extends UserBaseMapper {
 
+    String getPassword(@Param("username") String username);
+
+    SUser selectByUserName(@Param("username") String username);
 }

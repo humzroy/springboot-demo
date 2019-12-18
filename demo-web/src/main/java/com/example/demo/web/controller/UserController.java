@@ -1,14 +1,12 @@
 package com.example.demo.web.controller;
 
 import com.example.demo.biz.service.UserService;
+import com.example.demo.common.entity.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created with IntelliJ IDEA
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(tags = "用户")
 @RestController
-@RequestMapping("user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -34,5 +32,9 @@ public class UserController {
         userService.addUser(userNick);
     }
 
+    @RequestMapping(value = "/getMessage", method = RequestMethod.GET)
+    public Result<String> getMessage() {
+        return Result.wrapSuccessfulResult("您拥有用户权限，可以获得该接口的信息！", null);
+    }
 
 }
