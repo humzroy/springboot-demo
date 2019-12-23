@@ -63,7 +63,7 @@ public class JWTShiroRealm extends AuthorizingRealm {
         if (user == null) {
             throw new AuthenticationException("用户名不存在！");
         }
-
+        user.setSalt(secret);
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user, user.getSalt(), "jwtRealm");
         return authenticationInfo;
     }

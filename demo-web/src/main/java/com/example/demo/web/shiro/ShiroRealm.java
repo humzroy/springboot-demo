@@ -56,7 +56,7 @@ public class ShiroRealm extends AuthorizingRealm {
         principal.setUserCode(username);
         principal.setPassword(user.getPassword());
         principal.setUserName(user.getUserName());
-        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(principal, credentials, "shiroRealm");
+        SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(principal, password, "shiroRealm");
         return info;
     }
 
