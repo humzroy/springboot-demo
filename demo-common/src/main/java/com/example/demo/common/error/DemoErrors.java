@@ -7,10 +7,13 @@ public enum DemoErrors implements ServiceErrors {
     /**
      * 错误码
      */
-    SYSTEM_ERROR(10000, "系统错误"),
-    PARAM_ERROR(10001, "参数错误"),
+    SYSTEM_ERROR(500, "系统错误"),
+    PARAM_ERROR(201, "参数错误"),
 
-    USER_IS_NOT_EXIST(20000, "用户不存在"),
+    USER_IS_NOT_EXIST(404, "用户不存在"),
+    USER_UNAUTHORIZED(401, "用户验证失败"),
+    USER_REGISTER_FAILD(211, "用户注册失败"),
+    USER_ALREADY_EXISTS(210, "用户名已存在"),
     ;
     private Integer code;
 
@@ -28,7 +31,7 @@ public enum DemoErrors implements ServiceErrors {
      */
     @Override
     public Integer getCode() {
-        return null;
+        return code;
     }
 
     /**
@@ -38,6 +41,6 @@ public enum DemoErrors implements ServiceErrors {
      */
     @Override
     public String getMessage() {
-        return null;
+        return message;
     }
 }

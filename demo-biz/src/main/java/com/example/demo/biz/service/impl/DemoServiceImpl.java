@@ -61,8 +61,8 @@ public class DemoServiceImpl implements DemoService {
 
 
     private void innerMethod() {
-        userService.addUser("张三");
-        userService.addUser("李四");
+        // userService.addUser("张三");
+        // userService.addUser("李四");
         throw new BizException(DemoErrors.SYSTEM_ERROR);
     }
 }

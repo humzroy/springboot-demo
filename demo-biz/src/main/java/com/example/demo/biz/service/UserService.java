@@ -1,6 +1,5 @@
 package com.example.demo.biz.service;
 
-import com.example.demo.dao.entity.shiro.User;
 import com.example.demo.dao.entity.system.SUser;
 
 import java.util.List;
@@ -15,13 +14,12 @@ import java.util.List;
 public interface UserService {
 
     /**
-     * 添加用户
+     * 注册新用户
      *
-     * @param userNick 用户昵称
-     * @return Boolean
+     * @param user
+     * @return
      */
-    Boolean addUser(String userNick);
-
+    int registerUser(SUser user) throws Exception;
     /**
      * 获取用户字符串
      *
@@ -35,7 +33,7 @@ public interface UserService {
      *
      * @param userName
      */
-    public String generateJwtToken(String userName);
+    String generateJwtToken(String userName);
 
     /**
      * 获取上次token生成时的salt值和登录用户信息
@@ -43,14 +41,14 @@ public interface UserService {
      * @param userName
      * @return
      */
-    public SUser getJwtTokenInfo(String userName);
+    SUser getJwtTokenInfo(String userName);
 
     /**
      * 清除token信息
      *
      * @param userName 登录用户名
      */
-    public void deleteLoginInfo(String userName);
+    void deleteLoginInfo(String userName);
 
     /**
      * 获取数据库中保存的用户信息，主要是加密后的密码
@@ -66,7 +64,10 @@ public interface UserService {
      * @param userId
      * @return
      */
-    public List<String> getUserRoles(String userId);
+    List<String> getUserRoles(String userId);
 
     String getPassword(String username);
+
+
+
 }

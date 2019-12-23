@@ -18,7 +18,7 @@ public class ShiroUser implements Serializable {
     /**
      * 用户ID
      */
-    private String userCde;
+    private String userCode;
     /**
      * 密码
      */
@@ -32,9 +32,4 @@ public class ShiroUser implements Serializable {
      * 盐
      */
     private String salt;
-
-    /**
-     * email
-     */
-    private String email;
 }

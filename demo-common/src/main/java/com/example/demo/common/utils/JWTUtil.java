@@ -19,20 +19,45 @@ import java.util.Date;
  */
 public class JWTUtil {
     /**
-     * 过期时间1小时
+     * 过期时间 30 分钟
      */
-    private static final long EXPRIE_TIME = 30 * 60 * 1000;
+    private static final long EXPRIE_TIME = 60 * 1000 * 30;
+
+    /**
+     * 密钥，注意这里如果真实用到，应当设置到复杂点，相当于私钥的存在。如果被人拿到，想到于它可以自己制造token了。
+     */
+    private static final String SECRET = "F12839WhaaEV$";
+
+
+    /**
+     * 生成签名,30min后过期
+     *
+     * @param username 用户名
+     * @param salt     盐
+     * @return 加密的token
+     */
+    public static String sign(String username, String salt) {
+        Date date = new Date(System.currentTimeMillis() + EXPRIE_TIME);
+        Algorithm algorithm = Algorithm.HMAC256(salt);
+        // 附带username信息
+        return JWT.create()
+                .withClaim("username", username)
+                .withExpiresAt(date)
+                .withIssuedAt(new Date())
+                .sign(algorithm);
+    }
 
     /**
      * 校验token是否正确
      *
      * @param token  密钥
-     * @param secret 用户的密码
+     * @param secret 随机盐
      * @return 是否正确
      */
     public static boolean verify(String token, String username, String secret) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
+            // 在token中附带了username信息
             JWTVerifier verifier = JWT.require(algorithm)
                     .withClaim("username", username)
                     .build();
@@ -70,24 +95,6 @@ public class JWTUtil {
         } catch (JWTDecodeException e) {
             return null;
         }
-    }
-
-    /**
-     * 生成签名,5min后过期
-     *
-     * @param username 用户名
-     * @param salt     盐
-     * @return 加密的token
-     */
-    public static String sign(String username, String salt) {
-        Date date = new Date(System.currentTimeMillis() + EXPRIE_TIME);
-        Algorithm algorithm = Algorithm.HMAC256(salt);
-        // 附带username信息
-        return JWT.create()
-                .withClaim("username", username)
-                .withExpiresAt(date)
-                .withIssuedAt(new Date())
-                .sign(algorithm);
     }
 
     /**

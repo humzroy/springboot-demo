@@ -5,9 +5,10 @@ import com.example.demo.biz.service.UserService;
 import com.example.demo.common.error.DemoErrors;
 import com.example.demo.common.redis.CacheTime;
 import com.example.demo.common.redis.RedisClient;
+import com.example.demo.common.utils.DateUtil;
 import com.example.demo.common.utils.JWTUtil;
-import com.example.demo.dao.entity.UserDO;
-import com.example.demo.dao.entity.shiro.User;
+import com.example.demo.common.utils.PasswordUtil;
+import com.example.demo.common.utils.StringUtil;
 import com.example.demo.dao.entity.system.SUser;
 import com.example.demo.dao.mapper.business.UserMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -40,17 +41,30 @@ public class UserServiceImpl implements UserService {
     private RedisClient redisClient;
 
     /**
-     * 添加用户
+     * 注册新用户
      *
-     * @param userNick 用户昵称
-     * @return Boolean
+     * @param user
+     * @return
      */
     @Override
-    public Boolean addUser(String userNick) {
-        UserDO user = UserDO.builder()
-                .userNick(userNick)
-                .build();
-        return userMapper.insertSelective(user) > 0;
+    public int registerUser(SUser user) throws Exception {
+        int row = 0;
+        if (StringUtil.isNotEmpty(user.getLoginName()) && StringUtil.isNotEmpty(user.getPassword())) {
+            SUser userInfo = userMapper.selectByUserName(user.getLoginName());
+            if (userInfo != null) {
+                log.warn("该用户名已存在！");
+                row = -1;
+                return row;
+            }
+            // 密码加密
+            String newPassword = PasswordUtil.getEncryptePwd(user.getPassword());
+            user.setPassword(newPassword);
+            user.setCreateTime(DateUtil.getCurrentDateTime());
+            // 保存
+            row = userMapper.insertSelective(user);
+            log.info("用户：{}注册成功！", user.getLoginName());
+        }
+        return row;
     }
 
     /**
@@ -62,7 +76,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String getUserStr(Integer id) {
         Assert.notNull(id, "id不能为空");
-        UserDO user = userMapper.selectById(id);
+        SUser user = userMapper.selectByPrimaryKey(id);
         if (Objects.isNull(user)) {
             throw new BizException(DemoErrors.USER_IS_NOT_EXIST);
         }
@@ -77,13 +91,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String generateJwtToken(String userName) {
-        String salt = "12345";//JwtUtils.generateSalt();
-        /**
-         * @todo 将salt保存到数据库或者缓存中
-         * redisTemplate.opsForValue().set("token:"+userName, salt, 3600, TimeUnit.SECONDS);
-         */
+        String jwtSalt = JWTUtil.generateSalt();
+        // 将salt保存到缓存中,30分钟后失效
+        redisClient.set("token:" + userName, jwtSalt, 1800);
         // 生成jwt token
-        return JWTUtil.sign(userName, salt);
+        return JWTUtil.sign(userName, jwtSalt);
     }
 
     /**
@@ -94,14 +106,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public SUser getJwtTokenInfo(String userName) {
-        String salt = "12345";
-        /**
-         * @todo 从数据库或者缓存中取出jwt token生成时用的salt
-         * salt = redisTemplate.opsForValue().get("token:"+userName);
-         */
-        SUser user = getUserInfo(userName);
-        // user.setSalt(salt);
-        return user;
+        return getUserInfo(userName);
     }
 
     /**
@@ -111,10 +116,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void deleteLoginInfo(String userName) {
-        /**
-         * @todo 删除数据库或者缓存中保存的salt
-         * redisTemplate.delete("token:"+userName);
-         */
+        // 删除数据库或者缓存中保存的salt
+        redisClient.del("token:" + userName);
     }
 
     /**
@@ -125,8 +128,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public SUser getUserInfo(String userName) {
-        SUser user = userMapper.selectByUserName(userName);
-        return user;
+        return userMapper.selectByUserName(userName);
     }
 
     /**
@@ -144,5 +146,6 @@ public class UserServiceImpl implements UserService {
     public String getPassword(String username) {
         return userMapper.getPassword(username);
     }
+
 
 }

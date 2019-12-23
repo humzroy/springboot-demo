@@ -24,13 +24,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("add")
-    @ApiOperation("添加用户")
-    public void addUser(
-            @ApiParam(name = "userNick", value = "用户昵称", example = "test", required = true)
-            @RequestParam("userNick") String userNick) {
-        userService.addUser(userNick);
-    }
+    // @PostMapping("add")
+    // @ApiOperation("添加用户")
+    // public void addUser(
+    //         @ApiParam(name = "userNick", value = "用户昵称", example = "test", required = true)
+    //         @RequestParam("userNick") String userNick) {
+    //     userService.addUser(userNick);
+    // }
 
     @RequestMapping(value = "/getMessage", method = RequestMethod.GET)
     public Result<String> getMessage() {

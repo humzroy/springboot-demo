@@ -1,11 +1,7 @@
 package com.example.demo.dao.mapper.base;
 
-import com.example.demo.dao.entity.UserDO;
-import com.example.demo.dao.entity.param.UserConditionBuilder;
-import org.apache.ibatis.annotations.Param;
+import com.example.demo.dao.entity.system.SUser;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA
@@ -16,6 +12,13 @@ import java.util.List;
  */
 @Repository
 public interface UserBaseMapper {
+    /**
+     * 根据主键查询
+     *
+     * @param id
+     * @return
+     */
+    SUser selectByPrimaryKey(Integer id);
 
     /**
      * 插入（匹配有值的字段）
@@ -23,29 +26,22 @@ public interface UserBaseMapper {
      * @param record UserDO
      * @return int
      */
-    int insertSelective(UserDO record);
+    int insertSelective(SUser record);
 
     /**
-     * 根据主键ID更新（匹配有值的字段）
+     * 更新
      *
-     * @param record UserDO
-     * @return int
+     * @param record
+     * @return
      */
-    int updateById(UserDO record);
+
+    int updateByPrimaryKeySelective(SUser record);
 
     /**
-     * 动态条件查询（匹配有值的字段）
+     * 根据主键删除
      *
-     * @param params 筛选条件
-     * @return List<UserDO>
+     * @param id
+     * @return
      */
-    List<UserDO> selectByCondition(UserConditionBuilder params);
-
-    /**
-     * 根据主键ID查询
-     *
-     * @param id 主键ID
-     * @return UserDO
-     */
-    UserDO selectById(@Param("id") Integer id);
+    int deleteByPrimaryKey(Integer id);
 }

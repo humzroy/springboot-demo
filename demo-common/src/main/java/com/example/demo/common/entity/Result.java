@@ -24,19 +24,33 @@ public class Result<T> implements Serializable {
     public Result() {
     }
 
+    /**
+     * 调用成功返回结果
+     *
+     * @param data 返回数据
+     * @return
+     */
     public static <T> Result<T> wrapSuccessfulResult(T data) {
         Result<T> result = new Result<T>();
         result.data = data;
         result.success = true;
-        result.code = 0;
+        result.code = 200;
+        result.message = "";
         return result;
     }
 
+    /**
+     * 调用成功返回结果
+     *
+     * @param message 返回消息
+     * @param data    返回数据
+     * @return
+     */
     public static <T> Result<T> wrapSuccessfulResult(String message, T data) {
         Result<T> result = new Result<T>();
         result.data = data;
         result.success = true;
-        result.code = 0;
+        result.code = 200;
         result.message = message;
         return result;
     }
@@ -57,6 +71,13 @@ public class Result<T> implements Serializable {
         return result;
     }
 
+    /**
+     * 调用失败返回结果
+     *
+     * @param code    返回码
+     * @param message 返回消息
+     * @return
+     */
     public static <T> Result<T> wrapErrorResult(Integer code, String message) {
         Result<T> result = new Result<T>();
         result.success = false;

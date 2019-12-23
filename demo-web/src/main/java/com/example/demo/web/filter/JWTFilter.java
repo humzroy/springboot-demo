@@ -2,7 +2,10 @@ package com.example.demo.web.filter;
 
 import com.example.demo.web.shiro.JWTToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -11,6 +14,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  * @ClassName JWTFilter
@@ -23,50 +27,52 @@ import java.io.IOException;
 public class JWTFilter extends BasicHttpAuthenticationFilter {
 
     /**
-     * 判断用户是否想要登入。
-     * 检测header里面是否包含Authorization字段即可
+     * logger
      */
-    @Override
-    protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
-        HttpServletRequest req = (HttpServletRequest) request;
-        String authorization = req.getHeader("Authorization");
-        log.info("判断用户是否想要登录：{}", authorization);
-        return authorization != null;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
 
     /**
-     *
+     * 如果带有 token，则对 token 进行检查，否则直接通过
      */
     @Override
-    protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String authorization = httpServletRequest.getHeader("Authorization");
-        log.info("判断用户是否想要登录x：{}", authorization);
-        JWTToken token = new JWTToken(authorization);
-        // 提交给realm进行登入，如果错误他会抛出异常并被捕获
-        getSubject(request, response).login(token);
-        // 如果没有抛出异常则代表登入成功，返回true
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws UnauthorizedException {
+        //判断请求的请求头是否带上 "token"
+        if (isLoginAttempt(request, response)) {
+            //如果存在，则进入 executeLogin 方法执行登入，检查 token 是否正确
+            try {
+                executeLogin(request, response);
+                return true;
+            } catch (Exception e) {
+                //token 错误
+                responseError(response, e.getMessage());
+            }
+        }
+        //如果请求头不存在 Token，则可能是执行登陆操作或者是游客状态访问，无需检查 token，直接返回 true
         return true;
     }
 
     /**
-     * 这里我们详细说明下为什么最终返回的都是true，即允许访问
-     * 例如我们提供一个地址 GET /article
-     * 登入用户和游客看到的内容是不同的
-     * 如果在这里返回了false，请求会被直接拦截，用户看不到任何东西
-     * 所以我们在这里返回true，Controller中可以通过 subject.isAuthenticated() 来判断用户是否登入
-     * 如果有些资源只有登入用户才能访问，我们只需要在方法上面加上 @RequiresAuthentication 注解即可
-     * 但是这样做有一个缺点，就是不能够对GET,POST等请求进行分别过滤鉴权(因为我们重写了官方的方法)，但实际上对应用影响不大
+     * 判断用户是否想要登入。
+     * 检测 header 里面是否包含 Token 字段
      */
     @Override
-    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        if (isLoginAttempt(request, response)) {
-            try {
-                executeLogin(request, response);
-            } catch (Exception e) {
-                response401(request, response);
-            }
-        }
+    protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
+        HttpServletRequest req = (HttpServletRequest) request;
+        String token = req.getHeader("token");
+        return token != null;
+    }
+
+    /**
+     * 执行登陆操作
+     */
+    @Override
+    protected boolean executeLogin(ServletRequest request, ServletResponse response) {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        String token = httpServletRequest.getHeader("token");
+        JWTToken jwtToken = new JWTToken(token);
+        // 提交给realm进行登入，如果错误他会抛出异常并被捕获
+        getSubject(request, response).login(jwtToken);
+        // 如果没有抛出异常则代表登入成功，返回true
         return true;
     }
 
@@ -89,14 +95,17 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     }
 
     /**
-     * 将非法请求跳转到 /401
+     * 将非法请求跳转到 /unauthorized/**
      */
-    private void response401(ServletRequest req, ServletResponse resp) {
+    private void responseError(ServletResponse response, String message) {
         try {
-            HttpServletResponse httpServletResponse = (HttpServletResponse) resp;
-            httpServletResponse.sendRedirect("/401");
+            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+            //设置编码，否则中文字符在重定向时会变为空字符串
+            message = URLEncoder.encode(message, "UTF-8");
+            httpServletResponse.sendRedirect("/unauthorized/" + message);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
+
 }
