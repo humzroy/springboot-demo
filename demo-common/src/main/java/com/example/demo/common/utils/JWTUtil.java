@@ -4,67 +4,36 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import com.example.demo.common.constant.Constant;
 
-import java.util.Calendar;
 import java.util.Date;
 
 /**
- * @ClassName JWTUtil
- * @Description JWT工具类
- * @Author wuhengzhen
- * @Date 2019-12-12 16:42
- * @Version 1.0
+ * @author wuhengzhen
+ * @date 2019/10/3 15:43
  */
-public class JWTUtil {
-    /**
-     * 过期时间 30 分钟
-     */
-    private static final long EXPRIE_TIME = 60 * 1000 * 30;
-
-    /**
-     * 密钥，注意这里如果真实用到，应当设置到复杂点，相当于私钥的存在。如果被人拿到，想到于它可以自己制造token了。
-     */
-    private static final String SECRET = "F12839WhaaEV$";
-
-
-    /**
-     * 生成签名,30min后过期
-     *
-     * @param username 用户名
-     * @param salt     盐
-     * @return 加密的token
-     */
-    public static String sign(String username, String salt) {
-        Date date = new Date(System.currentTimeMillis() + EXPRIE_TIME);
-        Algorithm algorithm = Algorithm.HMAC256(salt);
-        // 附带username信息
-        return JWT.create()
-                .withClaim("username", username)
-                .withExpiresAt(date)
-                .withIssuedAt(new Date())
-                .sign(algorithm);
-    }
-
+public class JwtUtil {
     /**
      * 校验token是否正确
      *
      * @param token  密钥
-     * @param secret 随机盐
+     * @param secret 用户的密码
      * @return 是否正确
      */
-    public static boolean verify(String token, String username, String secret) {
+    public static boolean verify(String token, String secret) {
         try {
+            // 根据密码生成JWT效验器
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            // 在token中附带了username信息
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim("username", username)
+                    .withClaim("phone", getPhone(token))
+                    .withClaim("userId", getUserId(token))
                     .build();
-            // 校验TOKEN
+            // 效验TOKEN
             verifier.verify(token);
             return true;
-        } catch (Exception e) {
+        } catch (JWTVerificationException exception) {
             return false;
         }
     }
@@ -72,12 +41,12 @@ public class JWTUtil {
     /**
      * 获得token中的信息无需secret解密也能获得
      *
-     * @return token中包含的签发时间
+     * @return token中包含的用户名
      */
-    public static Date getIssuedAt(String token) {
+    public static String getPhone(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getIssuedAt();
+            return jwt.getClaim("phone").asString();
         } catch (JWTDecodeException e) {
             return null;
         }
@@ -88,34 +57,29 @@ public class JWTUtil {
      *
      * @return token中包含的用户名
      */
-    public static String getUsername(String token) {
+    public static String getUserId(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
-            return jwt.getClaim("username").asString();
+            return jwt.getClaim("userId").asString();
         } catch (JWTDecodeException e) {
             return null;
         }
     }
 
     /**
-     * token是否过期
-     *
-     * @return true：过期
+     * @param phone  用户名/手机号
+     * @param userId 用户id
+     * @param secret 用户的密码
+     * @return 加密的token
      */
-    public static boolean isTokenExpired(String token) {
-        Date now = Calendar.getInstance().getTime();
-        DecodedJWT jwt = JWT.decode(token);
-        return jwt.getExpiresAt().before(now);
-    }
+    public static String sign(String phone, Integer userId, String secret) {
+        Date date = new Date(System.currentTimeMillis() + Constant.TOKEN_EXPIRE_TIME);
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.create()
+                .withClaim("phone", phone)
+                .withClaim("userId", String.valueOf(userId))
+                .withExpiresAt(date)
+                .sign(algorithm);
 
-    /**
-     * 生成随机盐,长度32位
-     *
-     * @return
-     */
-    public static String generateSalt() {
-        SecureRandomNumberGenerator secureRandom = new SecureRandomNumberGenerator();
-        String hex = secureRandom.nextBytes(16).toHex();
-        return hex;
     }
 }

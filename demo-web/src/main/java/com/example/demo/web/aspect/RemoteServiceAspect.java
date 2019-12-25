@@ -1,8 +1,8 @@
 package com.example.demo.web.aspect;
 
-import com.example.demo.biz.exception.BizException;
+import com.example.demo.common.exception.BizException;
 import com.example.demo.common.entity.Result;
-import com.example.demo.common.error.DemoErrors;
+import com.example.demo.common.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -49,8 +49,8 @@ public class RemoteServiceAspect {
                 result.setCode(((BizException) e).getCode());
                 result.setMessage(e.getMessage());
             } else {
-                result.setCode(DemoErrors.SYSTEM_ERROR.getCode());
-                result.setMessage(DemoErrors.SYSTEM_ERROR.getMessage());
+                result.setCode(ErrorCodes.SYSTEM_ERROR.getCode());
+                result.setMessage(ErrorCodes.SYSTEM_ERROR.getMessage());
             }
             return result;
         }

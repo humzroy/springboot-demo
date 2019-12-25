@@ -1,23 +1,32 @@
 package com.example.demo.biz.service.impl;
 
-import com.example.demo.biz.exception.BizException;
-import com.example.demo.biz.service.UserService;
-import com.example.demo.common.error.DemoErrors;
-import com.example.demo.common.redis.CacheTime;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.biz.service.IConUserRoleService;
+import com.example.demo.biz.service.IUserService;
+import com.example.demo.common.constant.Constant;
+import com.example.demo.common.constant.ConstantRedisKey;
+import com.example.demo.common.entity.Result;
+import com.example.demo.common.enums.LoginType;
+import com.example.demo.common.enums.RoleEnums;
+import com.example.demo.common.error.ErrorCodes;
 import com.example.demo.common.redis.RedisClient;
-import com.example.demo.common.utils.DateUtil;
-import com.example.demo.common.utils.JWTUtil;
-import com.example.demo.common.utils.PasswordUtil;
-import com.example.demo.common.utils.StringUtil;
-import com.example.demo.dao.entity.system.SUser;
+import com.example.demo.common.shiro.token.CustomizedToken;
+import com.example.demo.common.utils.CommonsUtils;
+import com.example.demo.common.utils.JwtUtil;
+import com.example.demo.dao.entity.system.User;
 import com.example.demo.dao.mapper.business.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.ExpiredCredentialsException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,122 +39,118 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
-    private static final String encryptSalt = "F12839WhsnnEV$#23b";
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
+    @Resource
     private RedisClient redisClient;
 
-    /**
-     * 注册新用户
-     *
-     * @param user
-     * @return
-     */
+    @Resource
+    private IConUserRoleService conUserRoleService;
+
+
     @Override
-    public int registerUser(SUser user) throws Exception {
-        int row = 0;
-        if (StringUtil.isNotEmpty(user.getLoginName()) && StringUtil.isNotEmpty(user.getPassword())) {
-            SUser userInfo = userMapper.selectByUserName(user.getLoginName());
-            if (userInfo != null) {
-                log.warn("该用户名已存在！");
-                row = -1;
-                return row;
+    public Result sendLoginCode(String phone) {
+        // 这里使用默认值，随机验证码的方法为CommonsUtils.getCode()
+        int code = 666666;
+        // todo 此处为发送验证码代码
+        // 将验证码加密后存储到redis中
+        String encryptCode = CommonsUtils.encryptPassword(String.valueOf(code), phone);
+        redisClient.set(ConstantRedisKey.getLoginCodeKey(phone), encryptCode, Constant.CODE_EXPIRE_TIME);
+        return Result.wrapSuccessfulResult(null);
+    }
+
+    @Override
+    public Result loginByPassword(String phone, String password) {
+        // 1.获取Subject
+        Subject subject = SecurityUtils.getSubject();
+        User sysUser = this.selectUserByPhone(phone);
+        // 2.密码登录
+        if (Objects.isNull(sysUser)) {
+            // 3.1 返回该用户不存在
+            return Result.wrapErrorResult(ErrorCodes.USER_NOT_EXIST);
+        }
+        if (!subject.isAuthenticated()) {
+            // 3.封装用户数据
+            CustomizedToken token = new CustomizedToken(phone, password, LoginType.PASSWORD_LOGIN_TYPE.toString());
+            // 4.执行登录方法
+            try {
+                subject.login(token);
+                Map<String, Object> data = returnLoginInitParam(phone);
+                return Result.wrapSuccessfulResult(data);
+            } catch (UnknownAccountException e) {
+                return Result.wrapErrorResult(ErrorCodes.USERNAME_NOT_EXIST);
+            } catch (ExpiredCredentialsException e) {
+                return Result.wrapErrorResult(ErrorCodes.CODE_EXPIRE);
+            } catch (IncorrectCredentialsException e) {
+                return Result.wrapErrorResult(ErrorCodes.PASSWORD_ERROR);
             }
-            // 密码加密
-            String newPassword = PasswordUtil.getEncryptePwd(user.getPassword());
-            user.setPassword(newPassword);
-            user.setCreateTime(DateUtil.getCurrentDateTime());
-            // 保存
-            row = userMapper.insertSelective(user);
-            log.info("用户：{}注册成功！", user.getLoginName());
+        } else {
+            Map<String, Object> data = returnLoginInitParam(phone);
+            return Result.wrapSuccessfulResult(data);
         }
-        return row;
+
     }
 
-    /**
-     * 获取用户字符串
-     *
-     * @param id 用户ID
-     * @return String
-     */
     @Override
-    public String getUserStr(Integer id) {
-        Assert.notNull(id, "id不能为空");
-        SUser user = userMapper.selectByPrimaryKey(id);
-        if (Objects.isNull(user)) {
-            throw new BizException(DemoErrors.USER_IS_NOT_EXIST);
+    public Result loginByCode(String phone, String code) {
+        // 1.获取Subject
+        Subject subject = SecurityUtils.getSubject();
+        User sysUser = this.selectUserByPhone(phone);
+        // 2.验证码登录，如果该用户不存在则创建该用户
+        if (Objects.isNull(sysUser)) {
+            // 2.1 注册
+            this.register(phone);
         }
-        redisClient.set("user:" + id, user, CacheTime.CACHE_EXP_FIVE_MINUTES);
-        return user.toString();
+        if (!subject.isAuthenticated()) {
+            // 3.封装用户数据
+            CustomizedToken token = new CustomizedToken(phone, code, LoginType.CODE_LOGIN_TYPE.toString());
+            // 4.执行登录方法
+            try {
+                subject.login(token);
+                Map<String, Object> data = returnLoginInitParam(phone);
+                return Result.wrapSuccessfulResult(data);
+            } catch (UnknownAccountException e) {
+                return Result.wrapErrorResult(ErrorCodes.USERNAME_NOT_EXIST);
+            } catch (ExpiredCredentialsException e) {
+                return Result.wrapErrorResult(ErrorCodes.CODE_EXPIRE);
+            } catch (IncorrectCredentialsException e) {
+                return Result.wrapErrorResult(ErrorCodes.CODE_ERROR);
+            }
+        } else {
+            Map<String, Object> data = returnLoginInitParam(phone);
+            return Result.wrapSuccessfulResult(data);
+        }
+
     }
 
     /**
-     * 保存user登录信息，返回token
+     * 返回登录后初始化参数
      *
-     * @param userName
+     * @param phone phone
+     * @return Map
      */
-    @Override
-    public String generateJwtToken(String userName) {
-        String jwtSalt = JWTUtil.generateSalt();
-        // 将salt保存到缓存中,30分钟后失效
-        redisClient.set("token:" + userName, jwtSalt, 1800);
-        // 生成jwt token
-        return JWTUtil.sign(userName, jwtSalt);
+    private Map<String, Object> returnLoginInitParam(String phone) {
+        Map<String, Object> data = new HashMap<>(1);
+        User user = selectUserByPhone(phone);
+        // 生成jwtToken
+        String jwtToken = JwtUtil.sign(phone, user.getUserId(), user.getPassword());
+        // token
+        data.put("jwtToken", jwtToken);
+        return data;
     }
 
     /**
-     * 获取上次token生成时的salt值和登录用户信息
+     * 用户注册,默认密码为手机号后六位
      *
-     * @param userName
-     * @return
+     * @param phone phone
      */
-    @Override
-    public SUser getJwtTokenInfo(String userName) {
-        return getUserInfo(userName);
+    private void register(String phone) {
+        User user = new User();
+        user.setPhone(phone);
+        user.setRegisterTime(LocalDateTime.now());
+        String encryptPassword = CommonsUtils.encryptPassword(phone.substring(5, 11), phone);
+        user.setPassword(encryptPassword);
+        this.save(user);
+        conUserRoleService.connectUserRole(user.getUserId(), RoleEnums.ROLE1.getCode());
     }
-
-    /**
-     * 清除token信息
-     *
-     * @param userName 登录用户名
-     */
-    @Override
-    public void deleteLoginInfo(String userName) {
-        // 删除数据库或者缓存中保存的salt
-        redisClient.del("token:" + userName);
-    }
-
-    /**
-     * 获取数据库中保存的用户信息，主要是加密后的密码
-     *
-     * @param userName
-     * @return
-     */
-    @Override
-    public SUser getUserInfo(String userName) {
-        return userMapper.selectByUserName(userName);
-    }
-
-    /**
-     * 获取用户角色列表，强烈建议从缓存中获取
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public List<String> getUserRoles(String userId) {
-        return Arrays.asList("admin");
-    }
-
-    @Override
-    public String getPassword(String username) {
-        return userMapper.getPassword(username);
-    }
-
-
 }

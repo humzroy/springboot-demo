@@ -27,6 +27,7 @@
         <java.version>1.8</java.version>
         <demo.version>0.0.1-SNAPSHOT</demo.version>
         <mybatis.version>2.0.0</mybatis.version>
+        <mybatis.plus.version>3.3.0</mybatis.plus.version>
         <lombok.version>1.18.10</lombok.version>
         <guava.version>23.0</guava.version>
         <mysql.version>8.0.18</mysql.version>
@@ -68,11 +69,11 @@
             </dependency>
 
             <!-- 框架 -->
-            <!-- mybatis -->
+            <!--  mybatis-plus -->
             <dependency>
-                <groupId>org.mybatis.spring.boot</groupId>
-                <artifactId>mybatis-spring-boot-starter</artifactId>
-                <version>${mybatis.version}</version>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
             </dependency>
             <!-- mysql-connector-java -->
             <dependency>

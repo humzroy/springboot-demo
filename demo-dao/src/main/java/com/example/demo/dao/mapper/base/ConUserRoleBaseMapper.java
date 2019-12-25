@@ -1,17 +1,14 @@
 package com.example.demo.dao.mapper.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.demo.dao.entity.system.User;
+import com.example.demo.dao.entity.system.ConUserRole;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created with IntelliJ IDEA
- *
  * @Description
  * @Author wuhengzhen
- * @Date 2019-11-06 13:44
+ * @Date 2019-12-25 10:58
  */
 @Repository
-public interface UserBaseMapper extends BaseMapper<User> {
-
+public interface ConUserRoleBaseMapper extends BaseMapper<ConUserRole> {
 }
