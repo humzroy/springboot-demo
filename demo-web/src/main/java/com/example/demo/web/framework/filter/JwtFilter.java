@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.common.constant.Constant;
 import com.example.demo.common.shiro.token.JwtToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 
 /**
  * @author wuhengzhen
@@ -50,10 +52,13 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
                 } catch (IOException e1) {
                     log.error(e1.getMessage());
                 }
+            } catch (AuthenticationException ex) {
+                responseError(response, ex.getMessage());
             }
         }
         // 如果请求头不存在 Token，则可能是执行登陆操作或者是游客状态访问，无需检查 token，直接返回 true
         return true;
+
     }
 
     /**
@@ -86,5 +91,19 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             return false;
         }
         return super.preHandle(request, response);
+    }
+
+    /**
+     * 将非法请求跳转到 /unauthorized/**
+     */
+    private void responseError(ServletResponse response, String message) {
+        try {
+            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+            //设置编码，否则中文字符在重定向时会变为空字符串
+            message = URLEncoder.encode(message, "UTF-8");
+            httpServletResponse.sendRedirect("/unauthorized/" + message);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 }

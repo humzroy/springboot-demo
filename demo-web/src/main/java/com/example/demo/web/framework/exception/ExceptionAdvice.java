@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 
@@ -87,4 +88,24 @@ public class ExceptionAdvice {
         return Result.wrapErrorResult(ErrorCodes.REDIS_CONNECTION_FAILURE);
     }
 
+
+    /**
+     * 捕捉其他所有异常
+     *
+     * @param request
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(Exception.class)
+    public Result globalException(HttpServletRequest request, Throwable ex) {
+        return Result.wrapErrorResult(getStatus(request).value(), "访问出错，无法访问: " + ex.getMessage());
+    }
+
+    private HttpStatus getStatus(HttpServletRequest request) {
+        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        if (statusCode == null) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        return HttpStatus.valueOf(statusCode);
+    }
 }

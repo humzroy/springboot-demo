@@ -5,13 +5,18 @@ package com.example.demo.common.enums;
  */
 public enum RoleEnums {
     /**
-     * 角色1
+     * 管理员角色
      */
-    ROLE1(1, "role1", "角色1"),
+    ROLE_ADMIN(0, "admin", "管理员"),
     /**
-     * 角色2
+     * 普通用户
      */
-    ROLE2(2, "role2", "角色2");
+    ROLE_NORMAL(1, "normal", "普通用户"),
+    /**
+     * 会员用户
+     */
+    ROLE_VIP(2, "vip", "会员用户");
+
 
     private Integer code;
 

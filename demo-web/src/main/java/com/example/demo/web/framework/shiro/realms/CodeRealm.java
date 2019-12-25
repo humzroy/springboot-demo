@@ -1,10 +1,10 @@
 package com.example.demo.web.framework.shiro.realms;
 
-import com.example.demo.biz.service.IUserService;
+import com.example.demo.biz.service.system.ILoginService;
 import com.example.demo.common.constant.ConstantRedisKey;
 import com.example.demo.common.redis.RedisClient;
-import com.example.demo.dao.entity.system.User;
 import com.example.demo.common.shiro.token.CustomizedToken;
+import com.example.demo.dao.entity.system.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 public class CodeRealm extends AuthorizingRealm {
 
     @Resource
-    private IUserService userService;
+    private ILoginService loginService;
 
     @Resource
     private RedisClient redisClient;
@@ -34,6 +34,7 @@ public class CodeRealm extends AuthorizingRealm {
 
     /**
      * 获取授权信息
+     *
      * @param principals principals
      * @return AuthorizationInfo
      */
@@ -44,6 +45,7 @@ public class CodeRealm extends AuthorizingRealm {
 
     /**
      * 获取身份认证信息
+     *
      * @param authenticationToken authenticationToken
      * @return AuthenticationInfo
      * @throws AuthenticationException AuthenticationException
@@ -52,9 +54,9 @@ public class CodeRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
 
         CustomizedToken token = (CustomizedToken) authenticationToken;
-        log.info("CodeRealm"+token.getUsername()+"开始身份认证");
+        log.info("[CodeRealm] " + token.getUsername() + " 开始身份认证");
         // 根据手机号查询用户
-        User user = userService.selectUserByPhone(token.getUsername());
+        User user = loginService.selectUserByPhone(token.getUsername());
         if (user == null) {
             // 抛出账号不存在异常
             throw new UnknownAccountException();

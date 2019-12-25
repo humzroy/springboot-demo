@@ -24,7 +24,7 @@ public class UserModularRealmAuthenticator extends ModularRealmAuthenticator {
 
     @Override
     protected AuthenticationInfo doAuthenticate(AuthenticationToken authenticationToken) throws AuthenticationException {
-        log.info("UserModularRealmAuthenticator:method doAuthenticate() 执行 ");
+        log.info("UserModularRealmAuthenticator: method doAuthenticate() 执行. ");
         // 判断getRealms()是否返回为空
         assertRealmsConfigured();
 

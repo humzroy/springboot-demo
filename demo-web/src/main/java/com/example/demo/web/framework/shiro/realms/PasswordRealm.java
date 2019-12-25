@@ -1,9 +1,9 @@
 package com.example.demo.web.framework.shiro.realms;
 
 
-import com.example.demo.biz.service.IUserService;
-import com.example.demo.dao.entity.system.User;
+import com.example.demo.biz.service.system.ILoginService;
 import com.example.demo.common.shiro.token.CustomizedToken;
+import com.example.demo.dao.entity.system.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 public class PasswordRealm extends AuthorizingRealm {
 
     @Resource
-    private IUserService userService;
+    private ILoginService loginService;
 
     @Override
     public boolean supports(AuthenticationToken token) {
@@ -50,9 +50,9 @@ public class PasswordRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
 
         CustomizedToken token = (CustomizedToken) authenticationToken;
-        log.info("PasswordRealm" + token.getUsername() + "开始身份认证");
+        log.info("[PasswordRealm]" + token.getUsername() + " 开始身份认证");
         // 根据手机号查询用户
-        User user = userService.selectUserByPhone(token.getUsername());
+        User user = loginService.selectUserByPhone(token.getUsername());
         if (user == null) {
             // 抛出账号不存在异常
             throw new UnknownAccountException();
