@@ -3,12 +3,12 @@
 
  Source Server         :
  Source Server Type    : MySQL
- Source Server Version : 80017
+ Source Server Version : 50725
  Source Host           :
  Source Schema         : project
 
  Target Server Type    : MySQL
- Target Server Version : 80017
+ Target Server Version : 50725
  File Encoding         : 65001
 
  Date: 17/12/2019 18:21:55
