@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
  * @author wuhengzhen
  * @since 2019-12-17
  */
-@TableName("project_user")
+@TableName("user")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

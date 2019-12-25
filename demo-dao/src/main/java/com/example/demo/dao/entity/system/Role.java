@@ -17,7 +17,7 @@ import java.io.Serializable;
  * @author wuhengzhen
  * @since 2019-12-17
  */
-@TableName("project_role")
+@TableName("role")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

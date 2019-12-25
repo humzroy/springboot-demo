@@ -14,8 +14,8 @@
         SELECT
             b.role_name
         FROM
-            project_con_user_role a,
-            project_role b
+            con_user_role a,
+            role b
         WHERE
             a.role_id = b.role_id
           AND user_id = #{userId}

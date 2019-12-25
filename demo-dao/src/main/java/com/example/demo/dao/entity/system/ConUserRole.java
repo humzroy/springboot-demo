@@ -20,7 +20,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("project_con_user_role")
+@TableName("con_user_role")
 public class ConUserRole implements Serializable {
 
     private static final long serialVersionUID=1L;
