@@ -41,7 +41,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      *
      * @param objects
      * @return 只要有一个元素为Blank，则返回true
-     * @author zhou-baicheng
+     * @author wuhengzhen
      */
     public static boolean isBlank(Object... objects) {
         Boolean result = false;

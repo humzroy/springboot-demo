@@ -3,7 +3,7 @@ package com.example.demo.common.exception;
 import com.example.demo.common.error.ServiceErrors;
 
 /**
- * @author wuehengzhen
+ * @author wuhengzhen
  * @date 2019/11/06
  */
 public class BizException extends RuntimeException {

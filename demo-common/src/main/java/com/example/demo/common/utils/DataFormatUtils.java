@@ -340,7 +340,6 @@ public class DataFormatUtils {
      *
      * @param v 需要转换的小写金额
      * @return String
-     * @author zhangchengjian
      */
     public static String convertLower2Upper(double v) {
         if (v < 0 || v > MAX_VALUE) {
