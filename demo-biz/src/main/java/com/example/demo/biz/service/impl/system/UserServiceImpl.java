@@ -30,7 +30,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Result queryUserInfo(String phone) {
         User user = this.selectUserByPhone(phone);
-        return Result.wrapSuccessfulResult(user);
+        return Result.wrapSuccessfulResult("查询成功", user);
     }
 
     /**

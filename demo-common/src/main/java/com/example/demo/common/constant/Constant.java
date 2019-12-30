@@ -22,4 +22,14 @@ public class Constant {
      * token请求头名称
      */
     public static final String TOKEN_HEADER_NAME = "authorization";
+
+    /**
+     * 锁定
+     */
+    public static final String USER_STATUS_LOCKED = "2";
+
+    /**
+     * 未激活
+     */
+    public static final String USER_STATUS_UNACTIVATED_LOCKED = "5";
 }

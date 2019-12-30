@@ -2,6 +2,7 @@ package com.example.demo.web.framework.shiro.realms;
 
 
 import com.example.demo.biz.service.system.ILoginService;
+import com.example.demo.common.shiro.ShiroUser;
 import com.example.demo.common.shiro.token.CustomizedToken;
 import com.example.demo.dao.entity.system.User;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,15 @@ public class PasswordRealm extends AuthorizingRealm {
         String realmName = super.getName();
         // 4.盐,取用户信息中唯一的字段来生成盐值，避免由于两个用户原始密码相同，加密后的密码也相同
         ByteSource credentialsSalt = ByteSource.Util.bytes(user.getPhone());
-        return new SimpleAuthenticationInfo(user, credentials, credentialsSalt, realmName);
+        // 封装ShiroUser
+        ShiroUser principal = new ShiroUser();
+        principal.setUserId(user.getUserId());
+        principal.setPassword(user.getPassword());
+        principal.setUserName(user.getName());
+        principal.setPhone(user.getPhone());
+        principal.setSex(user.getSex());
+        principal.setBirth(user.getBirth());
+        principal.setRegisterTime(user.getRegisterTime());
+        return new SimpleAuthenticationInfo(principal, credentials, credentialsSalt, realmName);
     }
 }

@@ -10,6 +10,7 @@ import com.example.demo.common.enums.LoginType;
 import com.example.demo.common.enums.RoleEnums;
 import com.example.demo.common.error.ErrorCodes;
 import com.example.demo.common.redis.RedisClient;
+import com.example.demo.common.shiro.ShiroUtils;
 import com.example.demo.common.shiro.token.CustomizedToken;
 import com.example.demo.common.utils.CommonsUtils;
 import com.example.demo.common.utils.JwtUtils;
@@ -17,11 +18,9 @@ import com.example.demo.common.utils.NameUtils;
 import com.example.demo.dao.entity.system.User;
 import com.example.demo.dao.mapper.business.system.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -62,20 +61,18 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements I
 
     @Override
     public Result loginByPassword(String phone, String password) {
-        // 1.获取Subject
-        Subject subject = SecurityUtils.getSubject();
         User sysUser = this.selectUserByPhone(phone);
-        // 2.密码登录
+        // 1.密码登录
         if (Objects.isNull(sysUser)) {
             // 3.1 返回该用户不存在
             return Result.wrapErrorResult(ErrorCodes.USER_NOT_EXIST);
         }
-        // 3.封装用户数据
+        // 2.封装用户数据
         CustomizedToken token = new CustomizedToken(phone, password, LoginType.PASSWORD_LOGIN_TYPE.toString());
-        // 4.执行登录方法
+        // 3.执行登录方法
         try {
-            subject.login(token);
-            if (subject.isAuthenticated()) {
+            ShiroUtils.getSubject().login(token);
+            if (ShiroUtils.isLogin()) {
                 log.info("[密码登录] {}登录成功！", phone);
                 Map<String, Object> data = returnLoginInitParam(phone);
                 return Result.wrapSuccessfulResult("登录成功", data);
@@ -83,7 +80,6 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements I
                 log.error("[密码登录] {}登录失败", phone);
                 return Result.wrapErrorResult(ErrorCodes.USER_LOGIN_FAIL);
             }
-
         } catch (UnknownAccountException e) {
             return Result.wrapErrorResult(ErrorCodes.USERNAME_NOT_EXIST);
         } catch (ExpiredCredentialsException e) {
@@ -96,20 +92,18 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements I
 
     @Override
     public Result loginByCode(String phone, String code) {
-        // 1.获取Subject
-        Subject subject = SecurityUtils.getSubject();
         User sysUser = this.selectUserByPhone(phone);
-        // 2.验证码登录，如果该用户不存在则创建该用户
+        // 1.验证码登录，如果该用户不存在则创建该用户
         if (Objects.isNull(sysUser)) {
             // 2.1 注册
             this.register(phone);
         }
-        // 3.封装用户数据
+        // 2.封装用户数据
         CustomizedToken token = new CustomizedToken(phone, code, LoginType.CODE_LOGIN_TYPE.toString());
-        // 4.执行登录方法
+        // 3.执行登录方法
         try {
-            subject.login(token);
-            if (subject.isAuthenticated()) {
+            ShiroUtils.getSubject().login(token);
+            if (ShiroUtils.isLogin()) {
                 log.info("[验证码登录] {}登录成功！", phone);
                 Map<String, Object> data = returnLoginInitParam(phone);
                 return Result.wrapSuccessfulResult("登录成功", data);

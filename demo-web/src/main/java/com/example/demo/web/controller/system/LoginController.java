@@ -4,6 +4,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.example.demo.biz.service.system.ILoginService;
 import com.example.demo.common.entity.Result;
 import com.example.demo.common.error.ErrorCodes;
+import com.example.demo.common.shiro.ShiroUtils;
 import com.example.demo.web.framework.annotction.PhoneNumber;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -64,6 +65,12 @@ public class LoginController {
         return loginService.loginByCode(phone, code);
     }
 
+    @PostMapping("/logout")
+    public Result logout() {
+        ShiroUtils.logout();
+        System.out.println(ShiroUtils.isLogin());
+        return Result.wrapSuccessfulResult("登出成功");
+    }
 
     /**
      * Unauthorized api result.
