@@ -1,4 +1,4 @@
-package com.example.demo.common.utils;
+package com.example.demo.common.util;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;

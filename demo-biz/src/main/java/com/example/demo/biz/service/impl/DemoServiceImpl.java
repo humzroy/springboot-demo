@@ -4,7 +4,7 @@ import com.example.demo.common.exception.BizException;
 import com.example.demo.biz.service.DemoService;
 import com.example.demo.biz.service.system.IUserService;
 import com.example.demo.common.error.ErrorCodes;
-import com.example.demo.common.utils.HttpUtils;
+import com.example.demo.common.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

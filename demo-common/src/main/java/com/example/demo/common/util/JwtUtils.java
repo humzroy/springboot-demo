@@ -1,4 +1,4 @@
-package com.example.demo.common.utils;
+package com.example.demo.common.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
