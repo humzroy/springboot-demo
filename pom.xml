@@ -211,7 +211,18 @@
                 <artifactId>hutool-all</artifactId>
                 <version>5.0.4</version>
             </dependency>
-
+            <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>1.1.21</version>
+            </dependency>
+            <!-- oracle jdbc -->
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>11.2.0.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

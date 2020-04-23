@@ -1,4 +1,4 @@
-package com.example.demo.web.framework.datasource;
+package com.example.demo.common.datasource;
 
 import com.example.demo.common.util.StringUtils;
 

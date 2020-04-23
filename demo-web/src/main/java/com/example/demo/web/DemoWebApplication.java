@@ -1,9 +1,9 @@
 package com.example.demo.web;
 
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
@@ -15,7 +15,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  * @Author wuhengzhen
  * @Date 2019-11-06 10:02
  */
-@SpringBootApplication(scanBasePackages = "com.example.demo")
+@SpringBootApplication(scanBasePackages = {"com.example.demo"}, exclude = {DataSourceAutoConfiguration.class})
 @DubboComponentScan(basePackages = "com.example.demo.biz.service.impl.remote")
 public class DemoWebApplication extends SpringBootServletInitializer {
 

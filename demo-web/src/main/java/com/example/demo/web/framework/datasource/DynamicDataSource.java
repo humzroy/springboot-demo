@@ -1,5 +1,6 @@
 package com.example.demo.web.framework.datasource;
 
+import com.example.demo.common.datasource.DataSourceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
@@ -53,7 +54,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     }
 
     /**
-     * 构件DynamicDataSource对象静态方法
+     * 构建DynamicDataSource对象静态方法
      */
     public static DynamicDataSource build(DataSource defaultTargetDataSource, Map<Object, Object> targetDataSources) {
         return new DynamicDataSource(defaultTargetDataSource, targetDataSources);

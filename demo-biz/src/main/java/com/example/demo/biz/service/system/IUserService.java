@@ -2,6 +2,8 @@ package com.example.demo.biz.service.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.demo.common.datasource.DataSource;
+import com.example.demo.common.datasource.DataSourceConstant;
 import com.example.demo.common.entity.Result;
 import com.example.demo.dao.entity.system.User;
 
@@ -29,6 +31,7 @@ public interface IUserService extends IService<User> {
      * @author wuhengzhen
      * @date 2019/12/25 16:01
      **/
+    @DataSource(DataSourceConstant.MYSQL)
     Result queryUserInfo(String phone);
 
     /**
