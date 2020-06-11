@@ -34,7 +34,7 @@ public class SmsUtils {
      */
     private static final String DOMAIN = "dysmsapi.aliyuncs.com";
 
-    private static final String ACCESS_KEY_ID = "LTAI5qDyhMIa88yJ";
+    private static final String ACCESS_KEY_ID = "你的AccessKey";
     private static final String ACCESS_KEY_SECRET = "EqntPEnHpGuX4L4LPQCQgPUwMtPHdk";
     private static final String SIGN_NAME = "demo";
     private static final String TEMPLATE_CODE = "";
