@@ -1,5 +1,6 @@
 package com.example.demo.biz.service;
 
+import com.example.demo.common.constant.ConstantMongoDB;
 import com.example.demo.web.DemoWebApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
@@ -7,7 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA
@@ -28,6 +33,9 @@ public class DemoServiceTest {
 
     @Autowired
     StringEncryptor encryptor;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Test
     public void test() {
@@ -60,5 +68,19 @@ public class DemoServiceTest {
     //     System.out.println("加密后: "+encryptor.encrypt(str4));
     //
     // }
+
+    /**
+     * @description 测试MongoDB
+     * @author wuhengzhen
+     * @date 2020/6/23 11:05
+     **/
+    @Test
+    public void testMongoDB() {
+        Query query = new Query();
+
+        Map map = mongoTemplate.findOne(query, Map.class, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        System.out.println(map);
+
+    }
 
 }
