@@ -2,6 +2,7 @@ package com.example.demo.biz.service;
 
 import com.example.demo.common.constant.ConstantMongoDB;
 import com.example.demo.web.DemoWebApplication;
+import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.junit.Test;
@@ -9,9 +10,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -76,11 +79,48 @@ public class DemoServiceTest {
      **/
     @Test
     public void testMongoDB() {
-        Query query = new Query();
 
-        Map map = mongoTemplate.findOne(query, Map.class, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
-        System.out.println(map);
+        // **************** query ****************
+        // Query query = new Query();
+        //
+        // Map map = mongoTemplate.findOne(query, Map.class, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // System.out.println("查询结果：" + map);
+        // **************** query ****************
 
+
+        // **************** insert ****************
+        // Map<String, Object> insertMap = new HashMap<>();
+        // insertMap.put("name", "jerry");
+        // insertMap.put("age", 30);
+        // insertMap.put("email", "jerry@test.com");
+        // insertMap.put("address", "JiNan");
+        //
+        // Map<String, Object> insert = mongoTemplate.insert(insertMap, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // System.out.println("新增记录：" + insert.toString());
+        // **************** insert ****************
+
+
+        // **************** update ****************
+        // Query updateQuery = new Query();
+        // updateQuery.addCriteria(Criteria.where("name").is("tom"));
+        // Update update = new Update();
+        // update.set("age", 28);
+        // //查询到的全部更新
+        // // UpdateResult upsert = mongoTemplate.updateMulti(updateQuery, update, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // //查询更新第一条
+        // // UpdateResult upsert = mongoTemplate.updateFirst(updateQuery, update, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // //有则更新，没有则新增
+        // UpdateResult updateResult = mongoTemplate.upsert(updateQuery, update, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // System.out.println("更新数：" + updateResult.getModifiedCount());
+        // **************** update ****************
+
+
+        // **************** delete ****************
+        Query deleteQuery = new Query();
+        deleteQuery.addCriteria(Criteria.where("name").is("jerry"));
+        DeleteResult deleteResult = mongoTemplate.remove(deleteQuery, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        System.out.println("删除数：" + deleteResult.getDeletedCount());
+        // **************** delete ****************
     }
 
 }
