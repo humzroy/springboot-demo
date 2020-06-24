@@ -1,10 +1,10 @@
 package com.example.demo.biz.service.impl;
 
-import com.example.demo.biz.exception.BizException;
+import com.example.demo.common.exception.BizException;
 import com.example.demo.biz.service.DemoService;
-import com.example.demo.biz.service.UserService;
-import com.example.demo.common.error.DemoErrors;
-import com.example.demo.common.utils.HttpUtil;
+import com.example.demo.biz.service.system.IUserService;
+import com.example.demo.common.error.ErrorCodes;
+import com.example.demo.common.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DemoServiceImpl implements DemoService {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     /**
      * @description 接口测试
@@ -32,7 +32,8 @@ public class DemoServiceImpl implements DemoService {
      **/
     @Override
     public String test(Integer id) {
-        return userService.getUserStr(id);
+        // return userService.getUserStr(id);
+        return "";
     }
 
     /**
@@ -54,15 +55,15 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public void testHttp() {
         long start = System.currentTimeMillis();
-        String json = HttpUtil.sendGet("http://www.baidu.com", "");
+        String json = HttpUtils.sendGet("http://www.baidu.com", "");
         log.info("耗时:{}", System.currentTimeMillis() - start);
         log.info(json);
     }
 
 
     private void innerMethod() {
-        userService.addUser("张三");
-        userService.addUser("李四");
-        throw new BizException(DemoErrors.SYSTEM_ERROR);
+        // userService.addUser("张三");
+        // userService.addUser("李四");
+        throw new BizException(ErrorCodes.SYSTEM_ERROR);
     }
 }
