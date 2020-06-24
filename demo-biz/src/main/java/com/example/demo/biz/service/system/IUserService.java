@@ -31,7 +31,6 @@ public interface IUserService extends IService<User> {
      * @author wuhengzhen
      * @date 2019/12/25 16:01
      **/
-    @DataSource(DataSourceConstant.MYSQL)
     Result queryUserInfo(String phone);
 
     /**
