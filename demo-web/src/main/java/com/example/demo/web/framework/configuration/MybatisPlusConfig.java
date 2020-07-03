@@ -11,11 +11,14 @@ import com.example.demo.web.framework.datasource.DynamicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
@@ -30,6 +33,9 @@ import java.util.Map;
 @Configuration
 @MapperScan("com.example.demo.dao.mapper*")
 public class MybatisPlusConfig {
+
+    @Autowired
+    private MybatisProperties properties;
 
     /**
      * 分页插件，自动识别数据库类型
@@ -79,7 +85,8 @@ public class MybatisPlusConfig {
         // 重写的事务factory（解决多数据源切换事务控制不生效的问题） 暂时有问题，先不用，待解决
         /* String databaseIdentification = DataSourceContextHolder.getDataSource();  = null */
         // sqlSessionFactory.setTransactionFactory(new MultiDataSourceTransactionFactory());
-        //sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:/mapper/*/*Mapper.xml"));
+        sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/**/*Mapper.xml"));
+        // sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(this.properties.getConfigLocation()));
 
         MybatisConfiguration configuration = new MybatisConfiguration();
         //configuration.setDefaultScriptingLanguage(MybatisXMLLanguageDriver.class);
