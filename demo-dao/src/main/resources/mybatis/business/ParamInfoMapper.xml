@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.mapper.business.ParamInfoMapper">
+
+    <insert id="insertParamRecord" parameterType="com.example.demo.dao.entity.drools.ParamInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into re_param_info (id, param_sign, create_time, update_time)
+        values (#{id,jdbcType=VARCHAR}, #{paramSign,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+
+</mapper>

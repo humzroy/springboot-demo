@@ -1,0 +1,19 @@
+package droolRule;
+import com.example.demo.dao.entity.drools.QueryParam;
+import com.example.demo.common.entity.drools.RuleResult;
+import com.example.demo.biz.service.impl.drools.DroolsEngineServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+dialect  "java"
+rule "paramcheck1"
+    salience 99
+    when queryParam : QueryParam(paramId != null && paramSign.equals("+"))
+        resultParam : RuleResult()
+    then
+        final Logger LOGGER = LoggerFactory.getLogger("param-check-one 规则引擎");
+        LOGGER.info("参数:getParamId=" + queryParam.getParamId() + ";getParamSign=" + queryParam.getParamSign());
+        DroolsEngineServiceImpl ruleEngineService = new DroolsEngineServiceImpl();
+        ruleEngineService.executeAddRule(queryParam);
+        resultParam.setPostCodeResult(true);
+end
