@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.example.demo.common.datasource.DataSourceConstant;
 import com.example.demo.web.framework.configuration.ds.transcation.MultiDataSourceTransactionFactory;
 import com.example.demo.web.framework.datasource.DynamicDataSource;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
@@ -18,8 +19,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -33,6 +36,10 @@ import java.util.Map;
 @Configuration
 @MapperScan("com.example.demo.dao.mapper*")
 public class MybatisPlusConfig {
+
+    @Qualifier("webApplicationContext")
+    @Autowired
+    private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
     @Autowired
     private MybatisProperties properties;
@@ -82,12 +89,21 @@ public class MybatisPlusConfig {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(multipleDataSource(masterDatasource(), slaveDatasource()));
+        if (StringUtils.hasText(this.properties.getConfigLocation())) {
+            sqlSessionFactory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
+        }
         // 重写的事务factory（解决多数据源切换事务控制不生效的问题） 暂时有问题，先不用，待解决
         /* String databaseIdentification = DataSourceContextHolder.getDataSource();  = null */
         // sqlSessionFactory.setTransactionFactory(new MultiDataSourceTransactionFactory());
-        sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/**/*Mapper.xml"));
-        // sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(this.properties.getConfigLocation()));
-
+        // 方法一：手动指定mapper.xml文件位置
+        // sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/**/*Mapper.xml"));
+        // 方法二：使用mybatis-autoconfigure 已经自动加载的资源，不手动指定
+        if (!ObjectUtils.isEmpty(this.properties.resolveMapperLocations())) {
+            sqlSessionFactory.setMapperLocations(this.properties.resolveMapperLocations());
+        }
+        if (StringUtils.hasLength(this.properties.getTypeAliasesPackage())) {
+            sqlSessionFactory.setTypeAliasesPackage(this.properties.getTypeAliasesPackage());
+        }
         MybatisConfiguration configuration = new MybatisConfiguration();
         //configuration.setDefaultScriptingLanguage(MybatisXMLLanguageDriver.class);
         configuration.setJdbcTypeForNull(JdbcType.NULL);
