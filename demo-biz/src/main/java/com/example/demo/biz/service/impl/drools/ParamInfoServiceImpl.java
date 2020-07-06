@@ -6,6 +6,8 @@ import com.example.demo.dao.entity.drools.ParamInfo;
 import com.example.demo.dao.mapper.business.ParamInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Objects;
@@ -34,7 +36,7 @@ public class ParamInfoServiceImpl extends ServiceImpl<ParamInfoMapper, ParamInfo
     public ParamInfo selectById(String paramId) {
         ParamInfo paramInfo = paramInfoMapper.selectById(paramId);
         if (Objects.nonNull(paramInfo)) {
-            log.info("ParamInfoServiceImpl-Sign：{}", paramInfo.getParamSign());
+            log.info("ParamInfoServiceImpl-ParamInfo：{}", paramInfo.toString());
         } else {
             log.info("ParamInfoServiceImpl：{},paramId:{}", "未查询到数据", paramId);
         }
@@ -47,6 +49,7 @@ public class ParamInfoServiceImpl extends ServiceImpl<ParamInfoMapper, ParamInfo
      * @param paramInfo
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
     public void insertParam(ParamInfo paramInfo) {
         paramInfoMapper.insertParamRecord(paramInfo);
     }

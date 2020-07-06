@@ -10,6 +10,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -20,6 +21,7 @@ import static org.apache.commons.lang3.Validate.notNull;
  * @Description 多数据源切换，支持事务
  * 参考：
  * https://blog.csdn.net/gaoshili001/article/details/79378902
+ * https://www.cnblogs.com/itliyh/p/13251572.html
  * https://github.com/baomidou/dynamic-datasource-spring-boot-starter/issues/83
  * @Author wuhengzhen
  * @Date 2020-04-23 17:36
@@ -44,7 +46,6 @@ public class MultiDataSourceTransaction implements Transaction {
     private boolean autoCommit;
 
     /**
-     *
      * @param dataSource
      */
     public MultiDataSourceTransaction(DataSource dataSource) {
@@ -57,9 +58,11 @@ public class MultiDataSourceTransaction implements Transaction {
     @Override
     public Connection getConnection() throws SQLException {
         String databaseIdentification = DataSourceContextHolder.getDataSource();
-        if (databaseIdentification.equals(mainDatabaseIdentification)) {
-            if (mainConnection != null) return mainConnection;
-            else {
+        logger.info("databaseIdentification is null:" + Objects.isNull(databaseIdentification));
+        if (null == databaseIdentification || databaseIdentification.equals(mainDatabaseIdentification)) {
+            if (mainConnection != null) {
+                return mainConnection;
+            } else {
                 openMainConnection();
                 mainDatabaseIdentification = databaseIdentification;
                 return mainConnection;

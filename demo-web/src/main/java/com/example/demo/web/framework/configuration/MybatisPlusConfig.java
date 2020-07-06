@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.example.demo.common.datasource.DataSourceConstant;
+import com.example.demo.common.datasource.DataSourceContextHolder;
 import com.example.demo.web.framework.configuration.ds.transcation.MultiDataSourceTransactionFactory;
 import com.example.demo.web.framework.datasource.DynamicDataSource;
 import org.apache.commons.lang3.ObjectUtils;
@@ -89,12 +90,12 @@ public class MybatisPlusConfig {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(multipleDataSource(masterDatasource(), slaveDatasource()));
+        // 重写的事务factory（解决多数据源切换事务控制不生效的问题） 未测试
+        /* String databaseIdentification = DataSourceContextHolder.getDataSource();  = null */
+        sqlSessionFactory.setTransactionFactory(new MultiDataSourceTransactionFactory());
         if (StringUtils.hasText(this.properties.getConfigLocation())) {
             sqlSessionFactory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
         }
-        // 重写的事务factory（解决多数据源切换事务控制不生效的问题） 暂时有问题，先不用，待解决
-        /* String databaseIdentification = DataSourceContextHolder.getDataSource();  = null */
-        // sqlSessionFactory.setTransactionFactory(new MultiDataSourceTransactionFactory());
         // 方法一：手动指定mapper.xml文件位置
         // sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/**/*Mapper.xml"));
         // 方法二：使用mybatis-autoconfigure 已经自动加载的资源，不手动指定
