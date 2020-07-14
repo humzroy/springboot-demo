@@ -9,6 +9,7 @@ import com.example.demo.common.entity.Result;
 import com.example.demo.common.enums.LoginType;
 import com.example.demo.common.enums.RoleEnums;
 import com.example.demo.common.error.ErrorCodes;
+import com.example.demo.common.redis.CacheTime;
 import com.example.demo.common.redis.RedisClient;
 import com.example.demo.common.shiro.ShiroUtils;
 import com.example.demo.common.shiro.token.CustomizedToken;
@@ -67,6 +68,13 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements I
             // 3.1 返回该用户不存在
             return Result.wrapErrorResult(ErrorCodes.USER_NOT_EXIST);
         }
+        // 每次登录都需认证
+        // if (ShiroUtils.isLogin()) {
+        //     log.info("[密码登录] {}用户已登录！", phone);
+        //     Map<String, Object> data = new HashMap<>(1);
+        //     data.put("jwtToken", redisClient.get("jwtToken"));
+        //     return Result.wrapSuccessfulResult("登录成功！", data);
+        // }
         // 2.封装用户数据
         CustomizedToken token = new CustomizedToken(phone, password, LoginType.PASSWORD_LOGIN_TYPE.toString());
         // 3.执行登录方法
@@ -131,6 +139,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements I
         User user = selectUserByPhone(phone);
         // 生成jwtToken
         String jwtToken = JwtUtils.sign(phone, user.getUserId(), user.getPassword());
+        // redisClient.set("jwtToken", jwtToken, CacheTime.CACHE_EXP_QUARTER_MINUTES);
         // token
         data.put("jwtToken", jwtToken);
         return data;

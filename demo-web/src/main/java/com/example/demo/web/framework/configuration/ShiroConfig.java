@@ -185,8 +185,8 @@ public class ShiroConfig {
         realms.add(jwtRealm);
         securityManager.setRealms(realms);
 
-        /*
-         * 关闭shiro自带的session，详情见文档
+        /**
+         * 禁用session, 不保存用户登录状态。保证每次请求都重新认证。
          */
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
