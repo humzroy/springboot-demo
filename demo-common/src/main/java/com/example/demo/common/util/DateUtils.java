@@ -48,6 +48,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static final String PATTERN_STANDARD19X = "yyyy/MM/dd HH:mm:ss";
 
 
+    public static String getNowServerDateTime() {
+        return String.valueOf(System.currentTimeMillis());
+    }
+
+    public static Long getNowServerDateLongTime() {
+        return System.currentTimeMillis();
+    }
+
+    public static String getNowServerDate() {
+        return String.valueOf(System.currentTimeMillis() / 1000);
+    }
+
+    public static int getNowServerTimestamp() {
+        return (int) (System.currentTimeMillis() / 1000);
+    }
+
+    public static Long getNowServerDateLong() {
+        return Long.parseLong(String.valueOf(System.currentTimeMillis() / 1000));
+    }
+
+
     /**
      * 自动解析日期/时间字符串, 此方法会自动识别日期格式.
      *

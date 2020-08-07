@@ -52,6 +52,6 @@ public class DemoWebApplication extends SpringBootServletInitializer implements 
      */
     @Override
     public void run(String... args) throws Exception {
-        log.info("************** springboot启动完成！ **************");
+        log.info("************** springboot启动完成 **************");
     }
 }

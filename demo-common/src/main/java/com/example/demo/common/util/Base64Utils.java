@@ -152,7 +152,7 @@ public class Base64Utils {
         /*String clearStr = "12yyyy34567890-=rtyuiodsfsdfsdfklmsfmsdflmsdafsdfsdfsdfwerrwerpteoryym/,ppdksdfldfsdlkmmsdf6783$%#!~!#$%^&*&(WUHENGZHENwuhengzhen22411";
         String clearMd5 = null;
         try {
-            clearMd5 = MD5Utils.md5Hex(clearStr);
+            clearMd5 = MD5Util.encodeHex(clearStr);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

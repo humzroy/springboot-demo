@@ -34,10 +34,10 @@ public class SmsUtils {
      */
     private static final String DOMAIN = "dysmsapi.aliyuncs.com";
 
-    private static final String ACCESS_KEY_ID = "你的AccessKey";
+    private static final String ACCESS_KEY_ID = "LTAI5qDyhMIa88yJ";
     private static final String ACCESS_KEY_SECRET = "EqntPEnHpGuX4L4LPQCQgPUwMtPHdk";
     private static final String SIGN_NAME = "demo";
-    private static final String TEMPLATE_CODE = "";
+    private static final String TEMPLATE_CODE = "SMS_181856087";
     private static final String REGION_ID = "default";
     /**
      * 发送成功状态
@@ -100,7 +100,7 @@ public class SmsUtils {
     public static void main(String[] args) {
         Map<String, Object> param = new HashMap<>();
         param.put("code", CommonsUtils.getCode());
-        boolean f = sendSms("18353238798", "01", JSONUtil.toJsonStr(param));
+        boolean f = sendSms("18353238798", TEMPLATE_CODE, JSONUtil.toJsonStr(param));
         System.out.println(f);
     }
 
