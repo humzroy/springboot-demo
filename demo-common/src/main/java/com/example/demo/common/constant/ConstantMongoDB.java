@@ -14,5 +14,10 @@ public class ConstantMongoDB {
      */
     public static final String MONGO_COLLECTION_MY_TEST = "my_test";
 
+    /**
+     * MongoDB Collection：my_collection
+     */
+    public static final String MONGO_COLLECTION_MY_COLLECTION = "my_collection";
+
 
 }

@@ -16,7 +16,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
-    private static final String[] EXCLUDE_PATH_PATTERNS = {"/api/token/api_token"};
+    /**
+     * 不需要拦截的api
+     */
+    private static final String[] EXCLUDE_PATH_PATTERNS = {"/api/token/api_token", "/api/token/user_token"};
 
     @Autowired
     private TokenInterceptor tokenInterceptor;

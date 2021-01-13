@@ -1,6 +1,7 @@
 package com.example.demo.biz.service;
 
 import com.example.demo.common.constant.ConstantMongoDB;
+import com.example.demo.common.util.ThreadPoolUtils;
 import com.example.demo.web.DemoWebApplication;
 import com.mongodb.client.result.DeleteResult;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashMap;
@@ -39,6 +41,9 @@ public class DemoServiceTest {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private ThreadPoolUtils threadPoolUtils;
 
     @Test
     public void test() {
@@ -116,11 +121,34 @@ public class DemoServiceTest {
 
 
         // **************** delete ****************
-        Query deleteQuery = new Query();
-        deleteQuery.addCriteria(Criteria.where("name").is("jerry"));
-        DeleteResult deleteResult = mongoTemplate.remove(deleteQuery, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
-        System.out.println("删除数：" + deleteResult.getDeletedCount());
+        // Query deleteQuery = new Query();
+        // deleteQuery.addCriteria(Criteria.where("name").is("jerry"));
+        // DeleteResult deleteResult = mongoTemplate.remove(deleteQuery, ConstantMongoDB.MONGO_COLLECTION_MY_TEST);
+        // System.out.println("删除数：" + deleteResult.getDeletedCount());
         // **************** delete ****************
+
+
+        // ************ test ************
+        Query query = new Query();
+        query.addCriteria(Criteria.where("tids").in("sa"));
+        query.fields().include("name");
+        Map map = mongoTemplate.findOne(query, Map.class, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+        System.out.println(map);
+
+        Update update = new Update();
+        update.set("name", "tom");
+
+        System.out.println(update.getUpdateObject().isEmpty());
+
+        mongoTemplate.updateMulti(query, update, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+
+    }
+
+    @Test
+    public void testThreadPool(){
+        threadPoolUtils.execute(()->{
+            System.out.println("doing you want do!");
+        });
     }
 
 }

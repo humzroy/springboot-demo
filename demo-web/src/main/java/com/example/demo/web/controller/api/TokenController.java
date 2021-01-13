@@ -20,7 +20,11 @@ import java.util.Date;
 
 /**
  * @ClassName TokenController
- * @Description
+ * @Description 接口调用方(客户端)向接口提供方(服务器)申请接口调用账号，申请成功后，接口提供方会给接口调用方一个appId和一个key参数
+ * 客户端携带参数appId、timestamp、sign去调用服务器端的API token，其中sign=加密(appId + timestamp + key)
+ * 客户端拿着api_token 去访问不需要登录就能访问的接口
+ * 当访问用户需要登录的接口时，客户端跳转到登录页面，通过用户名和密码调用登录接口，登录接口会返回一个usertoken, 客户端拿着usertoken 去访问需要登录才能访问的接口
+ * sign的作用是防止参数被篡改，客户端调用服务端时需要传递sign参数，服务器响应客户端时也可以返回一个sign用于客户度校验返回的值是否被非法篡改了。客户端传的sign和服务器端响应的sign算法可能会不同。
  * @Author wuhengzhen
  * @Date 2020-08-07 13:59
  * @Version 1.0
@@ -35,7 +39,7 @@ public class TokenController {
 
 
     /**
-     * API Token
+     * 不需要登录访问的接口调用前需要访问此接口获取api_token
      *
      * @param sign
      * @return
@@ -57,6 +61,13 @@ public class TokenController {
         return ApiResponse.success(accessToken);
     }
 
+    /**
+     * 需要登录的接口调用前，需调用此接口获取user_token
+     *
+     * @param username
+     * @param password
+     * @return
+     */
     @NotRepeatSubmit(5000)
     @PostMapping("user_token")
     public ApiResponse<UserInfo> userToken(String username, String password) {
@@ -106,7 +117,7 @@ public class TokenController {
         String sign = MD5Util.encode(signString);
         System.out.println(sign);
         System.out.println("-------------------");
-        signString = "password=123456&username=1&12345678954556" + "ff03e64b-427b-45a7-b78b-47d9e8597d3b1529815393153sdfsdfsfs" + timestamp + "A1scr6";
+        signString = "password=123456&username=1&12345678954556" + "CB0CCAA24C664B8C8FC469E66915E87D" + timestamp + "A1scr6";
         sign = MD5Util.encode(signString);
         System.out.println(sign);
     }
