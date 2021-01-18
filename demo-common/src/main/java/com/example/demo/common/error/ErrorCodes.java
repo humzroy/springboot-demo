@@ -11,6 +11,8 @@ public enum ErrorCodes implements ServiceErrors {
     REDIS_CONNECTION_FAILURE(50002, "redis操作失败，请检查链接"),
     // 发送短信失败
     SEND_SMS_ERROR(50003, "发送失败"),
+    // 接口请求超限
+    OUT_OF_LIMIT(50004,"接口请求超限"),
     // 登录失败
     USER_LOGIN_FAIL(40001, "发送失败"),
     // 该用户不存在

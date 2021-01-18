@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolationException;
@@ -29,26 +30,34 @@ public class ControllerResultAspect {
     @Around("controllerResult()")
     public Result doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Result result = new Result();
-        try {
+        // try {
+            MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
+            String methodName = methodSignature.getMethod().getName();
+            if (log.isDebugEnabled()) {
+                log.debug("starting business logic processing.... " + methodName);
+            }
             result = (Result) proceedingJoinPoint.proceed();
-        } catch (BizException e) {
-            result.setSuccess(false);
-            result.setCode(e.getCode());
-            result.setMessage(e.getMessage());
-        } catch (ConstraintViolationException e) {
-            result.setSuccess(false);
-            result.setCode(ErrorCodes.MISSING_PARAMETER.getCode());
-            result.setMessage(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            result.setSuccess(false);
-            result.setCode(ErrorCodes.MISSING_PARAMETER.getCode());
-            result.setMessage(e.getMessage());
-        } catch (RuntimeException e) {
-            log.error("系统出错", e);
-            result.setSuccess(false);
-            result.setCode(ErrorCodes.SYSTEM_ERROR.getCode());
-            result.setMessage(ErrorCodes.SYSTEM_ERROR.getMessage());
-        }
+            if (log.isDebugEnabled()) {
+                log.debug("finished business logic processing...." + methodName);
+            }
+        // } catch (BizException e) {
+        //     result.setSuccess(false);
+        //     result.setCode(e.getCode());
+        //     result.setMessage(e.getMessage());
+        // } catch (ConstraintViolationException e) {
+        //     result.setSuccess(false);
+        //     result.setCode(ErrorCodes.MISSING_PARAMETER.getCode());
+        //     result.setMessage(e.getMessage());
+        // } catch (IllegalArgumentException e) {
+        //     result.setSuccess(false);
+        //     result.setCode(ErrorCodes.MISSING_PARAMETER.getCode());
+        //     result.setMessage(e.getMessage());
+        // } catch (RuntimeException e) {
+        //     log.error("系统出错", e);
+        //     result.setSuccess(false);
+        //     result.setCode(ErrorCodes.SYSTEM_ERROR.getCode());
+        //     result.setMessage(ErrorCodes.SYSTEM_ERROR.getMessage());
+        // }
         return result;
     }
 }

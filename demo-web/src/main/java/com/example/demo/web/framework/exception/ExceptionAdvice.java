@@ -4,6 +4,7 @@ package com.example.demo.web.framework.exception;
 import com.aliyuncs.exceptions.ClientException;
 import com.example.demo.common.entity.Result;
 import com.example.demo.common.error.ErrorCodes;
+import com.example.demo.common.exception.LimitException;
 import com.example.demo.common.exception.RedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -86,6 +87,16 @@ public class ExceptionAdvice {
     @ExceptionHandler(RedisException.class)
     public Result handleRedisException() {
         return Result.wrapErrorResult(ErrorCodes.REDIS_CONNECTION_FAILURE);
+    }
+
+    /**
+     * LimitException
+     *
+     * @return OUT_OF_LIMIT
+     */
+    @ExceptionHandler(LimitException.class)
+    public Result handleLimitException() {
+        return Result.wrapErrorResult(ErrorCodes.OUT_OF_LIMIT);
     }
 
 
