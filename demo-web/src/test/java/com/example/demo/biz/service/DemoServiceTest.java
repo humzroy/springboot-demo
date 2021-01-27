@@ -1,9 +1,17 @@
 package com.example.demo.biz.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONType;
+import com.example.demo.common.constant.Constant;
 import com.example.demo.common.constant.ConstantMongoDB;
+import com.example.demo.common.util.DateUtils;
+import com.example.demo.common.util.GetterUtils;
 import com.example.demo.common.util.ThreadPoolUtils;
 import com.example.demo.web.DemoWebApplication;
+import com.google.common.collect.Lists;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.junit.Test;
@@ -11,13 +19,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA
@@ -129,19 +141,39 @@ public class DemoServiceTest {
 
 
         // ************ test ************
+        MyMongoCollection myMongoCollection = new MyMongoCollection();
+        myMongoCollection.setName("tom");
+        myMongoCollection.setAge(22);
+        myMongoCollection.setPid(UUID.randomUUID().toString());
+        myMongoCollection.setTids(Lists.newArrayList("sa", "sf"));
         Query query = new Query();
-        query.addCriteria(Criteria.where("tids").in("sa"));
-        query.fields().include("name");
-        Map map = mongoTemplate.findOne(query, Map.class, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
-        System.out.println(map);
+        query.addCriteria(Criteria.where("pid").is("b4363ebe-e5c1-4ee5-98b6-852053a08a4c"));
 
-        Update update = new Update();
-        update.set("name", "tom");
+        long count = mongoTemplate.count(query, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+        if (count > 0) {
+            myMongoCollection.setUpdateTime(DateUtils.getCurrentDate());
+            Map map = JSON.parseObject(JSON.toJSONString(myMongoCollection), Map.class);
+            Update update = new Update();
+            map.forEach((k, v) -> {
+                if (v != null) {
+                    update.set(GetterUtils.getString(k), v);
+                }
+            });
+            mongoTemplate.updateMulti(query, update, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+        } else {
+            myMongoCollection.setCreateTime(DateUtils.getCurrentDateTime());
+            mongoTemplate.insert(myMongoCollection, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+        }
 
-        System.out.println(update.getUpdateObject().isEmpty());
-
-        mongoTemplate.updateMulti(query, update, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
-
+        // ************ test update or insert ************
+        // Query query = new Query();
+        // query.addCriteria(Criteria.where("name").is("jerry"));
+        //
+        // Update update = new Update();
+        // update.set("age", 19);
+        //
+        // UpdateResult upsert = mongoTemplate.upsert(query, update, ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION);
+        // System.out.println(upsert.getUpsertedId());
     }
 
     @Test
@@ -149,6 +181,25 @@ public class DemoServiceTest {
         threadPoolUtils.execute(()->{
             System.out.println("doing you want do!");
         });
+    }
+
+    @Data
+    @JSONType(ignores = {"serialVersionUID"})
+    @Document(collection = ConstantMongoDB.MONGO_COLLECTION_MY_COLLECTION)
+    class MyMongoCollection implements Serializable {
+        private String id;
+
+        private String pid;
+
+        private String name;
+
+        private Integer age;
+
+        private List<String> tids;
+
+        private String createTime;
+
+        private String updateTime;
     }
 
 }
